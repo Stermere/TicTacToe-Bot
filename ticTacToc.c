@@ -382,10 +382,6 @@ long long int getBitsOn(long long int i){
 
 // evaluate the board in a static position (pieces closer to the center are better)
 short evalBoardStatic(long long int *p1, long long int *p2, struct SearchInfo *boardData) {
-    // get the center of the board
-    short center = boardData->boardSize / 2;
-    short centerIndex = center * boardData->boardSize + center;
-
     // logically and the board with the center mask to get the pieces in the center
     long long int p1Center = *p1 & boardData->centerMask;
     long long int p2Center = *p2 & boardData->centerMask;
@@ -479,7 +475,10 @@ short evalBoard(long long int *p1, long long int *p2, struct SearchInfo *boardDa
 
     // for each move update the board and call evalBoard
     for (short i = 0; i < boardData->totalSquares; i++) {
-        if (moves >> i & 1) {
+        if (moves >> i == 0) {
+            break;
+        }
+        else if (moves >> i & 1) {
             makeMove(p1, p2, i, boardData);
             short eval = -evalBoard(p1, p2, boardData, i, -beta, -alpha);
 
@@ -499,8 +498,8 @@ short evalBoard(long long int *p1, long long int *p2, struct SearchInfo *boardDa
             if (bestEval > alpha) {
                 alpha = bestEval;
             }
-            if (alpha > beta) {
-                //break;
+            if (alpha >= beta) {
+                break;
             }
         }
     }
